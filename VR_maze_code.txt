@@ -1,0 +1,79 @@
+#include <ESP8266WiFi.h>
+#include <SPI.h>
+char ssid[] = "LIGHTNING";               
+char pass[] = "iamsorry";            
+String answer="left";           // password of your home WiFi
+IPAddress server(192,168,0,80);       // the fix IP address of the server
+WiFiClient client;
+void setup() {
+  Serial.begin(115200);               // only for debug
+  WiFi.begin(ssid, pass);             // connects to the WiFi router
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+   pinMode(D5,OUTPUT);
+  pinMode(D6,OUTPUT);
+  pinMode(D7,OUTPUT);
+  pinMode(D8,OUTPUT);
+  delay(100);
+
+    
+  }
+}
+
+void loop () {
+    Serial.print("in loop");
+  
+  client.connect(server, 80);   // Connection to the server
+  Serial.println("."); 
+  answer=client.readStringUntil('\r');   
+  client.flush();
+  Serial.println(answer);
+  gesfun(answer);
+  delay(10);
+  
+                // client will trigger the communication after two seconds
+}
+void gesfun(String answer)
+{
+  if(answer=="1")
+  {
+      analogWrite(D7,360);
+      analogWrite(D5,330);
+      analogWrite(D6,0);
+     analogWrite(D8,0);
+Serial.println("forward");
+  }
+else if(answer=="2")
+  {
+    analogWrite(D6,380);
+      analogWrite(D8,380);
+      analogWrite(D5,0);
+      analogWrite(D7,0);
+Serial.println("backward");
+  }
+else if(answer=="3")
+  {
+   analogWrite(D8,0);
+      analogWrite(D6,0);
+      analogWrite(D5,0);
+      analogWrite(D7,270);
+Serial.println("LEFT");
+  }
+else if(answer=="4")
+  {
+   analogWrite(D6,0);
+      analogWrite(D8,0);
+      analogWrite(D5,270);
+      analogWrite(D7,0);
+Serial.println("right");
+  }
+else
+{
+     analogWrite(D6,0);
+      analogWrite(D8,0);
+      analogWrite(D5,0);
+      analogWrite(D7,0);
+Serial.println("halt");
+}
+}
